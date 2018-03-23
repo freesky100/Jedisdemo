@@ -27,17 +27,16 @@ public class SimpleClientJedis {
         Jedis jedis = new Jedis(ip);
         jedis.auth(auth);
         Set<String> set = jedis.keys("*");
-        System.out.println(set);
         log.info("对象：{}",set);
         //no .1 查询key
         Iterator iterator = set.iterator();
         while(iterator.hasNext()){
             String value = (String)iterator.next();
-            System.out.println("Set key:"+value);
+            log.debug("Set keys:{}",value);
         }
 
         //no .2 打印String类型值
-        set.stream().forEach(e-> {if(jedis.type(e).equalsIgnoreCase("String"))System.out.println(jedis.get(e));});
+        set.forEach(e-> {if(jedis.type(e).equalsIgnoreCase("String"))System.out.println(jedis.get(e));});
 
         //no .3 操作list类型
         long listLength =jedis.llen("list");
@@ -47,5 +46,7 @@ public class SimpleClientJedis {
         jedis.rpush("list","拉斐尔");
        list = jedis.lrange("list",0,-1);
        log.debug("操作后list长度：{},list内容：{}",listLength,list);
+
+
     }
 }
