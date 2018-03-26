@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 前端分片
+ * 连接池
  * Created by yw on 2018/3/22.
  */
 @Slf4j
@@ -44,10 +44,14 @@ public class PoolClientJedis {
 
     private static synchronized Jedis getJedis(){
         Jedis jedis = null;
-        if(jedisPool!=null){
-            jedis = jedisPool.getResource();
+        try {
+            if (jedisPool != null) {
+                jedis = jedisPool.getResource();
+                log.debug("jedis对象:{}", jedis);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        log.debug("jedis对象:{}",jedis);
         return jedis;
     }
 
@@ -79,7 +83,7 @@ public class PoolClientJedis {
         jedis.mset("java","hello","c","world");
         log.debug("获取java值:{},c值{}",jedis.get("java"),jedis.get("c"));
 //        Thread.sleep(2000);
-        jedis.close();
+        close(jedis);
     }
 
     public static void TestHash(final Jedis jedis){
@@ -102,7 +106,7 @@ public class PoolClientJedis {
         Set<String> set= jedis.hkeys("girls");
         List<String> vals = jedis.hvals("girls");
         log.debug("获取信息:，存在：{},长度:{},keys列表：{}，vals列表：{}",exist,len,set,vals);
-        jedis.close();
+        close(jedis);
     }
 
     /**
@@ -126,7 +130,7 @@ public class PoolClientJedis {
         zParams.weightsByDouble(1,2.0);
         jedis.zunionstore("unionbooks",zParams,"book","book1");
         formatSet(jedis,"unionbooks");
-        jedis.close();
+        close(jedis);
     }
 
     /**
